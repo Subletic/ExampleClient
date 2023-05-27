@@ -26,7 +26,7 @@ public class ReceiveAVSWSC : ControllerBase
         }
     }
 
-    private async Task BinaryData (WebSocket webSocket)
+    private async static Task BinaryData (WebSocket webSocket)
     {
         byte[] dataBuffer = new byte[8 * 1024 * 1024];
         var receiveResult = await webSocket.ReceiveAsync (
