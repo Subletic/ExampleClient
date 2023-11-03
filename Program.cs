@@ -7,6 +7,14 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
+var configuration = new ConfigurationBuilder()
+    .SetBasePath(Directory.GetCurrentDirectory())
+    .AddJsonFile("appsettings.json")
+    .Build();
+builder.Services.AddSingleton<IConfiguration>(configuration);
+
+builder.Services.AddHostedService<SubleticClient>();
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
