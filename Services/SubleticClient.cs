@@ -19,7 +19,8 @@ public class SubleticClient : BackgroundService
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
-        Init_WebSocket(stoppingToken);
+        await Init_WebSocket(stoppingToken);
+        Task receiveTask = ReceiveMessages(stoppingToken);
 
         try
         {
@@ -37,6 +38,7 @@ public class SubleticClient : BackgroundService
                     await Task.Delay(configuration.GetValue<int>("SubleticClientSettings:VideoSnippetInterval"), stoppingToken);
                 }
             }
+            await receiveTask;
         }
         catch (System.NullReferenceException)
         {
@@ -48,13 +50,12 @@ public class SubleticClient : BackgroundService
         }
     }
 
-    private async void Init_WebSocket(CancellationToken stoppingToken)
+    private async Task Init_WebSocket(CancellationToken stoppingToken)
     {
         try
         {
             string targetWebSocketUrl = configuration.GetValue<string>("SubleticClientSettings:WebSocketUrl")!;
             await client.ConnectAsync(new Uri(targetWebSocketUrl), stoppingToken);
-            var _ = ReceiveMessages(stoppingToken);
         }
         catch (System.NullReferenceException)
         {
