@@ -1,10 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
-using System.Buffers;
 using System.Net.WebSockets;
 using System.Text;
-using System.Threading;
-using System.Web;
-using System;
 
 namespace WebSocketsSample.Controllers;
 
@@ -18,8 +14,8 @@ public class SendSubtitlesWSC : ControllerBase
             using var webSocket = await HttpContext.WebSockets.AcceptWebSocketAsync();
 
             // loop
-            Task handleCloseTask = HandleClose (webSocket); // start waiting for close request
-            await LoremIpsum (webSocket); // send out data
+            Task handleCloseTask = HandleClose(webSocket); // start waiting for close request
+            await LoremIpsum(webSocket); // send out data
             await handleCloseTask;
         }
         else
@@ -30,7 +26,7 @@ public class SendSubtitlesWSC : ControllerBase
 
     private bool shouldClose = false;
 
-    private async Task HandleClose (WebSocket webSocket)
+    private async Task HandleClose(WebSocket webSocket)
     {
         while (!shouldClose)
         {
@@ -45,7 +41,7 @@ public class SendSubtitlesWSC : ControllerBase
         }
     }
 
-    private async Task LoremIpsum (WebSocket webSocket)
+    private async Task LoremIpsum(WebSocket webSocket)
     {
         const string loremipsum = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor "
             + "incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco "
@@ -55,11 +51,11 @@ public class SendSubtitlesWSC : ControllerBase
 
         while (!shouldClose)
         {
-            foreach (string word in loremipsum.Split (' '))
+            foreach (string word in loremipsum.Split(' '))
             {
                 if (shouldClose) break;
-                SendMessageFull (webSocket, PrepareStringForProcessing (word));
-                Thread.Sleep (1000);
+                SendMessageFull(webSocket, PrepareStringForProcessing(word));
+                Thread.Sleep(1000);
             }
         }
 
@@ -70,9 +66,9 @@ public class SendSubtitlesWSC : ControllerBase
     }
 
     // send one text in its entirety
-    private async void SendMessageFull (WebSocket webSocket, byte[] message)
+    private async void SendMessageFull(WebSocket webSocket, byte[] message)
     {
-        PrintMessage (message);
+        PrintMessage(message);
 
         await webSocket.SendAsync(
             message,
@@ -81,21 +77,21 @@ public class SendSubtitlesWSC : ControllerBase
             HttpContext.RequestAborted);
     }
 
-    private static byte[] PrepareStringForProcessing (string msg)
+    private static byte[] PrepareStringForProcessing(string msg)
     {
         UTF8Encoding encoding = new UTF8Encoding();
-        return encoding.GetBytes (msg.Trim('\0'));
+        return encoding.GetBytes(msg.Trim('\0'));
     }
 
-    private static void PrintMessage (byte[] data)
+    private static void PrintMessage(byte[] data)
     {
         Encoding ascii = Encoding.ASCII;
 
-        Console.Write ("Sending message: ");
+        Console.Write("Sending message: ");
         foreach (byte elem in data)
         {
-            Console.Write ((elem > 31 && elem < 127) ? ascii.GetString (new[] { elem }) : ".");
+            Console.Write((elem > 31 && elem < 127) ? ascii.GetString(new[] { elem }) : ".");
         }
-        Console.WriteLine ("");
+        Console.WriteLine("");
     }
 }

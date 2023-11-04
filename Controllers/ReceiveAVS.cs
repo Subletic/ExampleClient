@@ -1,10 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
-using System.Buffers;
 using System.Net.WebSockets;
-using System.Text;
-using System.Threading;
-using System.Web;
-using System;
+
 
 namespace WebSocketsSample.Controllers;
 
@@ -18,7 +14,7 @@ public class ReceiveAVSWSC : ControllerBase
             using var webSocket = await HttpContext.WebSockets.AcceptWebSocketAsync();
 
             // loop
-            await BinaryData (webSocket); // receive data
+            await BinaryData(webSocket); // receive data
         }
         else
         {
@@ -26,22 +22,22 @@ public class ReceiveAVSWSC : ControllerBase
         }
     }
 
-    private async static Task BinaryData (WebSocket webSocket)
+    private async static Task BinaryData(WebSocket webSocket)
     {
         byte[] dataBuffer = new byte[8 * 1024 * 1024];
-        var receiveResult = await webSocket.ReceiveAsync (
-            new ArraySegment<byte> (dataBuffer),
+        var receiveResult = await webSocket.ReceiveAsync(
+            new ArraySegment<byte>(dataBuffer),
             CancellationToken.None);
 
         // for now, just keep swallowing the data
         while (!receiveResult.CloseStatus.HasValue)
         {
-            receiveResult = await webSocket.ReceiveAsync (
-                new ArraySegment<byte> (dataBuffer),
+            receiveResult = await webSocket.ReceiveAsync(
+                new ArraySegment<byte>(dataBuffer),
                 CancellationToken.None);
         }
 
-        await webSocket.CloseAsync (
+        await webSocket.CloseAsync(
             receiveResult.CloseStatus.Value,
             receiveResult.CloseStatusDescription,
             CancellationToken.None);

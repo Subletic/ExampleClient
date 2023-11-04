@@ -1,9 +1,7 @@
-using System;
 using System.Text;
 using System.Net.WebSockets;
-using System.Threading;
-using System.Threading.Tasks;
-using Microsoft.Extensions.Configuration;
+
+namespace MockServer.Services;
 
 public class SubleticClient : BackgroundService
 {
@@ -29,9 +27,10 @@ public class SubleticClient : BackgroundService
             using (var fileStream = new FileStream(videoPath, FileMode.Open, FileAccess.Read))
             {
                 byte[] buffer = new byte[2048];
+                Memory<byte> memoryBuffer = new Memory<byte>(buffer);
 
                 int bytesRead;
-                while ((bytesRead = await fileStream.ReadAsync(buffer, 0, buffer.Length, stoppingToken)) > 0)
+                while ((bytesRead = await fileStream.ReadAsync(memoryBuffer, stoppingToken)) > 0)
                 {
                     var segment = new ArraySegment<byte>(buffer, 0, bytesRead);
                     await client.SendAsync(segment, WebSocketMessageType.Binary, bytesRead < buffer.Length, stoppingToken);
@@ -55,7 +54,7 @@ public class SubleticClient : BackgroundService
         {
             string targetWebSocketUrl = configuration.GetValue<string>("SubleticClientSettings:WebSocketUrl")!;
             await client.ConnectAsync(new Uri(targetWebSocketUrl), stoppingToken);
-            ReceiveMessages(stoppingToken);
+            var _ = ReceiveMessages(stoppingToken);
         }
         catch (System.NullReferenceException)
         {
