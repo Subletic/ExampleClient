@@ -23,7 +23,7 @@ public class SubleticClient : BackgroundService
 
         try
         {
-            string videoPath = "Videos/" + configuration.GetValue<string>("SubleticClientSettings:TestVideoName");
+            string videoPath = "Media/" + configuration.GetValue<string>("SubleticClientSettings:TestVideoName");
             using (var fileStream = new FileStream(videoPath, FileMode.Open, FileAccess.Read))
             {
                 byte[] buffer = new byte[2048];
