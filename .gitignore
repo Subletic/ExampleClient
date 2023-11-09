@@ -476,3 +476,10 @@ $RECYCLE.BIN/
 
 # Windows shortcuts
 *.lnk
+
+###
+### Manually-added ignores
+###
+
+# Output sent back by the Backend
+ReceivedSubtitles.vtt
