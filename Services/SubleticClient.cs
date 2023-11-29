@@ -1,15 +1,22 @@
-using System.Text;
-using System.Net.WebSockets;
-
 namespace MockServer.Services;
 
+using System.Net.WebSockets;
+using System.Text;
+
+/// <summary>
+/// Represents a client for interacting with the Subletic service.
+/// </summary>
 public class SubleticClient : BackgroundService
 {
-    private readonly IConfiguration configuration;
-    private ClientWebSocket client;
     private const int MAX_RECEIVABLE_CHARACTER_LENGTH_OF_SUBTITLES_IN_KILOBYTE = 4;
     private readonly string exportFilePath;
+    private readonly IConfiguration configuration;
+    private ClientWebSocket client;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="SubleticClient"/> class.
+    /// </summary>
+    /// <param name="configuration">Holds the appsettings.json variables</param>
     public SubleticClient(IConfiguration configuration)
     {
         this.configuration = configuration;
@@ -17,6 +24,7 @@ public class SubleticClient : BackgroundService
         exportFilePath = "ReceivedSubtitles." + configuration.GetValue<string>("SubleticClientSettings:SubtitleFormat");
     }
 
+    /// <inheritdoc/>
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
         await Init_WebSocket(stoppingToken);
@@ -38,9 +46,10 @@ public class SubleticClient : BackgroundService
                     await Task.Delay(configuration.GetValue<int>("SubleticClientSettings:VideoSnippetInterval"), stoppingToken);
                 }
             }
+
             await receiveTask;
         }
-        catch (System.NullReferenceException)
+        catch (NullReferenceException)
         {
             Console.WriteLine("Please provide a valid video name in appsettings.json");
         }
@@ -54,15 +63,15 @@ public class SubleticClient : BackgroundService
     {
         try
         {
-            string targetWebSocketUrl = configuration.GetValue<string>("SubleticClientSettings:WebSocketUrl")!;
+            string targetWebSocketUrl = Environment.GetEnvironmentVariable("BACKEND_WEBSOCKET_URL") ?? "ws://localhost:40114/transcribe";
             await client.ConnectAsync(new Uri(targetWebSocketUrl), stoppingToken);
         }
-        catch (System.NullReferenceException)
+        catch (NullReferenceException)
         {
             Console.WriteLine("Please provide a valid WebSocket URL in appsettings.json");
             return;
         }
-        catch (System.Net.WebSockets.WebSocketException)
+        catch (WebSocketException)
         {
             Console.WriteLine("No connection to the WebSocket server possible. Please check the URL in appsettings.json");
             return;
