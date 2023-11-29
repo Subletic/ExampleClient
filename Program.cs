@@ -12,7 +12,7 @@ var configuration = new ConfigurationBuilder()
     .Build();
 builder.Services.AddSingleton<IConfiguration>(configuration);
 
-builder.Services.AddHostedService<SubleticClient>();
+builder.Services.AddHostedService<SubleticClientService>();
 
 var app = builder.Build();
 

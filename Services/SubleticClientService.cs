@@ -6,7 +6,7 @@ using System.Text;
 /// <summary>
 /// Represents a client for interacting with the Subletic service.
 /// </summary>
-public class SubleticClient : BackgroundService
+public class SubleticClientService : BackgroundService
 {
     private const int MAX_RECEIVABLE_CHARACTER_LENGTH_OF_SUBTITLES_IN_KILOBYTE = 4;
     private readonly string exportFilePath;
@@ -14,10 +14,10 @@ public class SubleticClient : BackgroundService
     private ClientWebSocket client;
 
     /// <summary>
-    /// Initializes a new instance of the <see cref="SubleticClient"/> class.
+    /// Initializes a new instance of the <see cref="SubleticClientService"/> class.
     /// </summary>
     /// <param name="configuration">Holds the appsettings.json variables</param>
-    public SubleticClient(IConfiguration configuration)
+    public SubleticClientService(IConfiguration configuration)
     {
         this.configuration = configuration;
         client = new ClientWebSocket();
