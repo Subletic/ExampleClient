@@ -8,6 +8,7 @@ using System.Text;
 /// </summary>
 public class SubleticClientService : BackgroundService
 {
+    private const string DEFAULT_BACKEND_WEBSOCKET_URL = "ws://localhost:40114/transcribe";
     private const int MAX_RECEIVABLE_CHARACTER_LENGTH_OF_SUBTITLES_IN_KILOBYTE = 4;
     private readonly string exportFilePath;
     private readonly IConfiguration configuration;
@@ -73,7 +74,7 @@ public class SubleticClientService : BackgroundService
     {
         try
         {
-            string targetWebSocketUrl = Environment.GetEnvironmentVariable("BACKEND_WEBSOCKET_URL") ?? "ws://localhost:40114/transcribe";
+            string targetWebSocketUrl = Environment.GetEnvironmentVariable("BACKEND_WEBSOCKET_URL") ?? DEFAULT_BACKEND_WEBSOCKET_URL;
             await client.ConnectAsync(new Uri(targetWebSocketUrl), stoppingToken);
             Console.WriteLine($"{DateTime.Now.ToString("HH:mm:ss")} - Connected to Subletic.");
         }
