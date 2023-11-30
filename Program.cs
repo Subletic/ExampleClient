@@ -2,10 +2,7 @@ using MockServer.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
-
 builder.Services.AddControllers();
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
@@ -15,11 +12,10 @@ var configuration = new ConfigurationBuilder()
     .Build();
 builder.Services.AddSingleton<IConfiguration>(configuration);
 
-builder.Services.AddHostedService<SubleticClient>();
+builder.Services.AddHostedService<SubleticClientService>();
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
@@ -28,7 +24,7 @@ if (app.Environment.IsDevelopment())
 
 var webSocketOptions = new WebSocketOptions
 {
-    KeepAliveInterval = TimeSpan.FromMinutes(2)
+    KeepAliveInterval = TimeSpan.FromMinutes(2),
 };
 
 app.UseWebSockets(webSocketOptions);
