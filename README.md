@@ -14,7 +14,7 @@ Contains an ASP.NET Core project for mocking a client using Subletic. It attempt
 
 ## Connection
 
-To start the software a few **environment-variables** have to be set. When the software ist run for development purpose a **`launchSettings.json`** can be used to set these values. Also note the port **`40118`** the Mock-Server is started on.
+To start the software a few **environment-variables** have to be set. When the software is run for development purpose a **`launchSettings.json`** can be used to set these values. Also note the port **`40118`** the Mock-Server is started on.
 
 | Variable-Name | Value | Development | Production |
 |---|---|---|---|
