@@ -1,6 +1,6 @@
 # Mock Server
 
-Contains an ASP.NET Core project for Mocking a Client using Subletic. It attempts to connect to the Subletic Backend and retries it when the connection is interrupted.
+Contains an ASP.NET Core project for mocking a client using Subletic. It attempts to connect to the Subletic-Backend and retries it when the connection is interrupted.
 
 ## Usage
 
@@ -14,11 +14,43 @@ Contains an ASP.NET Core project for Mocking a Client using Subletic. It attempt
 
 ## Connection
 
-To start the software a few environment-variables have to be set:
+To start the software a few **environment-variables** have to be set. When the software ist run for development purpose a **`launchSettings.json`** can be used to set these values. Also note the port **`40118`** the Mock-Server is started on.
 
 | Variable-Name | Value | Development | Production |
 |---|---|---|---|
 | BACKEND_WEBSOCKET_URL | ws://d.projekte.swe.htwk-leipzig.de:40114/transcribe | ❌ | ✅ |
+
+**`Properties/launchSettings.json`:**
+```json
+{
+  "$schema": "https://json.schemastore.org/launchsettings.json",
+  "iisSettings": {
+    "windowsAuthentication": false,
+    "anonymousAuthentication": true,
+    "iisExpress": {
+      "applicationUrl": "http://localhost:61006",
+      "sslPort": 44387
+    }
+  },
+  "profiles": {
+    "http": {
+      "commandName": "Project",
+      "dotnetRunMessages": true,
+      "launchBrowser": true,
+      "launchUrl": "swagger",
+      "applicationUrl": "http://localhost:40118",
+      "environmentVariables": {
+        "BACKEND_WEBSOCKET_URL": "ws://localhost:40114/transcribe"
+      }
+    },
+    "IIS Express": {
+      "commandName": "IISExpress",
+      "launchBrowser": true,
+      "launchUrl": "swagger",
+    }
+  }
+}
+```
 
 ## Ports
 
