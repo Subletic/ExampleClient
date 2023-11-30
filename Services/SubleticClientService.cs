@@ -28,17 +28,17 @@ public class SubleticClientService : BackgroundService
     {
         while (stoppingToken.IsCancellationRequested is false)
         {
-            Console.WriteLine($"{DateTime.Now.ToString("HH:mm:ss")} - Trying to connect to Subletic...");
+            Console.WriteLine($"{DateTime.Now:HH:mm:ss} - Trying to connect to Subletic...");
             await ConnectToSubletic(stoppingToken);
-            await Task.Delay(1000); // Wait for one second before attempting reconnect.
+            await Task.Delay(1000, stoppingToken); // Wait for one second before attempting reconnect.
         }
     }
 
     private async Task ConnectToSubletic(CancellationToken stoppingToken)
     {
         ClientWebSocket client = new ClientWebSocket();
-        await Init_WebSocket(stoppingToken, client);
-        Task receiveTask = ReceiveMessages(stoppingToken, client);
+        await Init_WebSocket(client, stoppingToken);
+        Task receiveTask = ReceiveMessages(client, stoppingToken);
 
         try
         {
@@ -70,13 +70,13 @@ public class SubleticClientService : BackgroundService
         }
     }
 
-    private async Task Init_WebSocket(CancellationToken stoppingToken, ClientWebSocket client)
+    private static async Task Init_WebSocket(ClientWebSocket client, CancellationToken stoppingToken)
     {
         try
         {
             string targetWebSocketUrl = Environment.GetEnvironmentVariable("BACKEND_WEBSOCKET_URL") ?? DEFAULT_BACKEND_WEBSOCKET_URL;
             await client.ConnectAsync(new Uri(targetWebSocketUrl), stoppingToken);
-            Console.WriteLine($"{DateTime.Now.ToString("HH:mm:ss")} - Connected to Subletic.");
+            Console.WriteLine($"{DateTime.Now:HH:mm:ss)} - Connected to Subletic.");
         }
         catch (Exception e)
         {
@@ -89,7 +89,7 @@ public class SubleticClientService : BackgroundService
         }
     }
 
-    private async Task ReceiveMessages(CancellationToken stoppingToken, ClientWebSocket client)
+    private async Task ReceiveMessages(ClientWebSocket client, CancellationToken stoppingToken)
     {
         var buffer = new byte[1024 * MAX_RECEIVABLE_CHARACTER_LENGTH_OF_SUBTITLES_IN_KILOBYTE];
 
