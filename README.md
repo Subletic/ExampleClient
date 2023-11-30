@@ -38,10 +38,7 @@ To start the software a few **environment-variables** have to be set. When the s
       "dotnetRunMessages": true,
       "launchBrowser": true,
       "launchUrl": "swagger",
-      "applicationUrl": "http://localhost:40118",
-      "environmentVariables": {
-        "BACKEND_WEBSOCKET_URL": "ws://localhost:40114/transcribe"
-      }
+      "applicationUrl": "http://localhost:40118"
     },
     "IIS Express": {
       "commandName": "IISExpress",
