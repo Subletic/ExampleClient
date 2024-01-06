@@ -56,6 +56,10 @@ public class SubleticClientService : BackgroundService
                     await Task.Delay(configuration.GetValue<int>("SubleticClientSettings:VideoSnippetInterval"), stoppingToken);
                 }
             }
+            await client.CloseOutputAsync(
+                WebSocketCloseStatus.NormalClosure,
+                "done with my side of the transmission",
+                stoppingToken);
 
             await receiveTask;
         }
@@ -104,7 +108,7 @@ public class SubleticClientService : BackgroundService
             }
             else if (result.MessageType == WebSocketMessageType.Close)
             {
-                await client.CloseOutputAsync(WebSocketCloseStatus.NormalClosure, "", CancellationToken.None);
+                break;
             }
         }
     }
