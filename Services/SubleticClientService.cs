@@ -10,10 +10,10 @@ public class SubleticClientService : BackgroundService
 {
     private const string DEFAULT_BACKEND_WEBSOCKET_URL = "ws://localhost:40114/transcribe";
     private const int MAX_RECEIVABLE_CHARACTER_LENGTH_OF_SUBTITLES_IN_KILOBYTE = 4;
-    private const string FALLBACK_SUBTITLE_FORMAT = "webvtt";
+    private const string FALLBACK_SUBTITLE_FORMAT = "vtt";
     private readonly string subtitleFormat;
-    private readonly string exportFilePath;
     private readonly IConfiguration configuration;
+    private string exportFilePath;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="SubleticClientService"/> class.
@@ -22,8 +22,9 @@ public class SubleticClientService : BackgroundService
     public SubleticClientService(IConfiguration configuration)
     {
         this.configuration = configuration;
-        exportFilePath = "ReceivedSubtitles." + configuration.GetValue<string>("SubleticClientSettings:SubtitleFormat");
-        subtitleFormat = configuration.GetValue<string>("SubleticClientSettings:SubtitleFormat") ?? FALLBACK_SUBTITLE_FORMAT;
+        this.subtitleFormat = configuration.GetValue<string>("SubleticClientSettings:SubtitleFormat") ??
+                              FALLBACK_SUBTITLE_FORMAT;
+        this.exportFilePath = this.evaluateFilePath();
     }
 
     /// <inheritdoc/>
@@ -32,8 +33,8 @@ public class SubleticClientService : BackgroundService
         while (stoppingToken.IsCancellationRequested is false)
         {
             Console.WriteLine($"{DateTime.Now:HH:mm:ss} - Trying to connect to Subletic...");
-            await ConnectToSubletic(stoppingToken);
-            await Task.Delay(100000, stoppingToken); // Wait for one second before attempting reconnect.
+            await this.ConnectToSubletic(stoppingToken);
+            await Task.Delay(1000, stoppingToken); // Wait for one second before attempting reconnect.
         }
     }
 
@@ -42,20 +43,22 @@ public class SubleticClientService : BackgroundService
         ClientWebSocket client = new ClientWebSocket();
         await Init_WebSocket(client, stoppingToken);
 
+        this.exportFilePath = this.evaluateFilePath();
+
         // Submit our preferred subtitle format
-        var subtitleFormatMessageBuffer = Encoding.UTF8.GetBytes(subtitleFormat);
+        var subtitleFormatMessageBuffer = Encoding.UTF8.GetBytes(this.subtitleFormat);
         await client.SendAsync(
             buffer: subtitleFormatMessageBuffer,
             messageType: WebSocketMessageType.Text,
             endOfMessage: true,
             cancellationToken: stoppingToken);
 
-        Task receiveTask = ReceiveMessages(client, stoppingToken);
+        Task receiveTask = this.ReceiveMessages(client, stoppingToken);
 
         try
         {
-            string videoPath = "Media/" + configuration.GetValue<string>("SubleticClientSettings:TestVideoName");
-            using (var fileStream = new FileStream(videoPath, FileMode.Open, FileAccess.Read))
+            string videoPath = "Media/" + this.configuration.GetValue<string>("SubleticClientSettings:TestVideoName");
+            await using (var fileStream = new FileStream(videoPath, FileMode.Open, FileAccess.Read))
             {
                 byte[] buffer = new byte[2048];
                 Memory<byte> memoryBuffer = new Memory<byte>(buffer);
@@ -70,7 +73,7 @@ public class SubleticClientService : BackgroundService
                         bytesRead < buffer.Length,
                         stoppingToken);
                     await Task.Delay(
-                        configuration.GetValue<int>("SubleticClientSettings:VideoSnippetInterval"),
+                        this.configuration.GetValue<int>("SubleticClientSettings:VideoSnippetInterval"),
                         stoppingToken);
                 }
             }
@@ -94,6 +97,30 @@ public class SubleticClientService : BackgroundService
                     Console.WriteLine(e.Message);
                     break;
             }
+        }
+    }
+
+    private string evaluateFilePath()
+    {
+        const string FILE_NAME = "ReceivedSubtitles";
+        var fileType = this.configuration.GetValue<string>("SubleticClientSettings:SubtitleFormat") ?? "vtt";
+        var fileId = 0;
+        string filePath = FILE_NAME + "." + fileType;
+        while (true)
+        {
+            if (File.Exists(filePath))
+            {
+                fileId++;
+                filePath = FILE_NAME + $" ({fileId})." + fileType;
+                continue;
+            }
+
+            if (fileId == 0)
+            {
+                return FILE_NAME + "." + fileType;
+            }
+
+            return filePath;
         }
     }
 
@@ -135,7 +162,8 @@ public class SubleticClientService : BackgroundService
             if (result.MessageType == WebSocketMessageType.Text)
             {
                 var message = Encoding.UTF8.GetString(buffer, 0, result.Count);
-                File.AppendAllText(exportFilePath, message + Environment.NewLine);
+
+                File.AppendAllText(this.exportFilePath, message + Environment.NewLine);
             }
             else if (result.MessageType == WebSocketMessageType.Close)
             {

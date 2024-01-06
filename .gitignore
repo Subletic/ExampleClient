@@ -482,5 +482,5 @@ $RECYCLE.BIN/
 ###
 
 # Output sent back by the Backend
-ReceivedSubtitles.vtt
+ReceivedSubtitles*.*
 Properties/
