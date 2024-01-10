@@ -14,6 +14,7 @@ public class SubleticClientService : BackgroundService
     private readonly string subtitleFormat;
     private readonly IConfiguration configuration;
     private string exportFilePath;
+    private bool stopSendingEarly = false;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="SubleticClientService"/> class.
@@ -53,6 +54,7 @@ public class SubleticClientService : BackgroundService
             endOfMessage: true,
             cancellationToken: stoppingToken);
 
+        stopSendingEarly = false;
         Task receiveTask = this.ReceiveMessages(client, stoppingToken);
 
         try
@@ -64,7 +66,7 @@ public class SubleticClientService : BackgroundService
                 Memory<byte> memoryBuffer = new Memory<byte>(buffer);
 
                 int bytesRead;
-                while ((bytesRead = await fileStream.ReadAsync(memoryBuffer, stoppingToken)) > 0)
+                while (!stopSendingEarly && (bytesRead = await fileStream.ReadAsync(memoryBuffer, stoppingToken)) > 0)
                 {
                     var segment = new ArraySegment<byte>(buffer, 0, bytesRead);
                     await client.SendAsync(
@@ -167,6 +169,7 @@ public class SubleticClientService : BackgroundService
             }
             else if (result.MessageType == WebSocketMessageType.Close)
             {
+                stopSendingEarly = result.CloseStatus! != WebSocketCloseStatus.NormalClosure;
                 break;
             }
         }
