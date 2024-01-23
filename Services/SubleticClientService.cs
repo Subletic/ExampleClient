@@ -130,8 +130,8 @@ public class SubleticClientService : BackgroundService
     {
         try
         {
-            string targetWebSocketUrl = Environment.GetEnvironmentVariable("BACKEND_WEBSOCKET_URL") ??
-                                        DEFAULT_BACKEND_WEBSOCKET_URL;
+            string targetWebSocketUrl = Environment.GetEnvironmentVariable("BACKEND_WEBSOCKET_URL") ?? DEFAULT_BACKEND_WEBSOCKET_URL;
+            client.Options.RemoteCertificateValidationCallback = (sender, certificate, chain, sslPolicyErrors) => true;
             await client.ConnectAsync(new Uri(targetWebSocketUrl), stoppingToken);
             Console.WriteLine($"{DateTime.Now:HH:mm:ss)} - Connected to Subletic.");
         }

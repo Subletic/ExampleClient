@@ -40,6 +40,7 @@ To start the software a few **environment-variables** have to be set. When the s
             "launchUrl": "swagger",
             "applicationUrl": "http://localhost:40118",
             "environmentVariables": {
+                "BACKEND_WEBSOCKET_URL!": "wss://d.projekte.swe.htwk-leipzig.de:40115/transcribe",
                 "BACKEND_WEBSOCKET_URL": "ws://localhost:40114/transcribe"
             }
         },
@@ -54,9 +55,9 @@ To start the software a few **environment-variables** have to be set. When the s
 
 ## Ports
 
-| Software    | Port  |
-|-------------|-------|
-| Frontend    | 40110 |
-| Backend     | 40114 |
-| Mock Server | 40118 |
+| Software    | HTTP Port  | HTTPS Port |
+|-------------|------------|------------|
+| Frontend    | 40110      | 40111      |
+| Backend     | 40114      | 40115      |
+| Mock Server | 40118      | 40119      |
 
