@@ -1,6 +1,6 @@
-# Mock Server
+# Example-Client
 
-Contains an ASP.NET Core project for mocking a client using Subletic. It attempts to connect to the Subletic-Backend and retries it when the connection is interrupted.
+Example how to connect to Subletic. It attempts to connect to the Backend and retries it when the connection is interrupted.
 
 ## Usage
 
@@ -16,9 +16,9 @@ Contains an ASP.NET Core project for mocking a client using Subletic. It attempt
 
 To start the software a few **environment-variables** have to be set. When the software is run for development purpose a **`launchSettings.json`** can be used to set these values. Also note the port **`40118`** the Mock-Server is started on.
 
-| Variable-Name | Value | Development | Production |
-|---|---|---|---|
-| BACKEND_WEBSOCKET_URL | ws://d.projekte.swe.htwk-leipzig.de:40114/transcribe | ❌ | ✅ |
+| Variable-Name | Value |
+|---|---|
+| BACKEND_WEBSOCKET_URL | ws://d.projekte.swe.htwk-leipzig.de:40114/transcribe |
 
 **`Properties/launchSettings.json`:**
 ```json
@@ -40,7 +40,6 @@ To start the software a few **environment-variables** have to be set. When the s
             "launchUrl": "swagger",
             "applicationUrl": "http://localhost:40118",
             "environmentVariables": {
-                "BACKEND_WEBSOCKET_URL!": "wss://d.projekte.swe.htwk-leipzig.de:40115/transcribe",
                 "BACKEND_WEBSOCKET_URL": "ws://localhost:40114/transcribe"
             }
         },
@@ -57,7 +56,6 @@ To start the software a few **environment-variables** have to be set. When the s
 
 | Software    | HTTP Port  | HTTPS Port |
 |-------------|------------|------------|
-| Frontend    | 40110      | 40111      |
 | Backend     | 40114      | 40115      |
 | Mock Server | 40118      | 40119      |
 
